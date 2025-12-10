@@ -1,4 +1,6 @@
 {% load static %}
+{% load i18n %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,19 +18,55 @@
         <link href="{% static 'app/css/styles.css'  %}" rel="stylesheet" />
     </head>
     <body>
+
+     <!-- Django Messages Popup -->
+    {% if messages %}
+        <div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+            {% for message in messages %}
+                <div class="alert alert-info"
+                     style="padding: 12px 20px; background: #d1ecf1; border: 1px solid #bee5eb;
+                            color: #0c5460; border-radius: 6px; margin-bottom: 10px;
+                            box-shadow: 0 3px 6px rgba(0,0,0,0.15);">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+             <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const messages = document.querySelectorAll('.message-item');
+
+            messages.forEach((msg) => {
+                setTimeout(() => {
+                    msg.style.transition = "opacity 1s ease";
+                    msg.style.opacity = "0";
+
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 1000);
+
+                }, 3000); // 3 soniya turadi
+            });
+        });
+        </script>
+
+
+
+
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="{% url 'app:index'%}">Apelsin</a>
+                <a class="navbar-brand" href="{% url 'app:index'%}">{% trans "Apelsin" %}</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'app:index' %}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'app:contact_view' %}">Get In Touch</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'app:index' %}">{% trans "HOME" %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'app:contact_view' %}">{% trans "Get In Touchh" %}</a></li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% trans "Categories" %}</a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'app:index' %}">All Products</a></li>
+                                <li><a class="dropdown-item" href="{% url 'app:index' %}">{% trans "All Products" %}</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 {% for category in categories%}
                                     <li><a class="dropdown-item" href="{% url 'app:products_of_category' category.id %} ">{{category.title}}</a></li>
@@ -40,7 +78,7 @@
                         <input type="text" name="q" class="form-contro">
                         <button class="btn btn-outline-dark" type="submit">
                             <i class="bi-search-fill me-1"></i>
-                            Search
+                            {% trans "Search" %}
                            
                         </button>
                     </form>
@@ -48,16 +86,54 @@
                         <div>
                             <form method="post" action="{% url 'user:logout_page' %}">
                                 {%csrf_token%}
-                                <button type="submit" class="btn btn-primary ms-4 ">Logout</button>
+                                <button type="submit" class="btn btn-primary ms-4 ">{% trans "Logout" %}</button>
                             </form>
                         </div>
                     {%else%}
                         <div>
                             <a href="{% url 'user:login_page' %}">
-                                <button type="button" class="btn btn-primary ms-4 ">Login</button>
+                                <button type="button" class="btn btn-primary ms-4 "> {% trans "Login" %}</button>
                             </a>
                         </div>
                     {%endif%}
+                    <div>
+                        <form action="/i18n/setlang/" method="post" class="custom-select inline-block">
+                              {% csrf_token %}
+                              <select id="language-select"
+                                      name="language"
+                                      onchange="saveLang(this)"
+                                      class="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg px-4 py-2">
+                                  <option value="uz" {% if LANGUAGE_CODE == "uz" %}selected{% endif %}> O'zbekcha</option>
+                                  <option value="ru" {% if LANGUAGE_CODE == "ru" %}selected{% endif %}> Russian</option>
+                                  <option value="en" {% if LANGUAGE_CODE == "en" %}selected{% endif %}> English</option>
+                              </select>
+                        </form>
+
+                        <script>
+                            function saveLang(select) {
+                                localStorage.setItem("active_lang", select.value);
+                                select.form.submit();
+                            }
+
+                            document.addEventListener("DOMContentLoaded", function () {
+                                const saved = localStorage.getItem("active_lang");
+                                const select = document.getElementById("language-select");
+
+                                if (saved) {
+                                    select.value = saved;
+                                }
+                            });
+
+                        </script>
+
+
+                        <style>
+                            .custom-select {
+                                background-color: #72757bff;
+                            }
+                        </style>
+                    </div>
+
                     
                 </div>
             </div>
@@ -72,7 +148,7 @@
 
         <!-- Footer-->
         <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+            <div class="container"><p class="m-0 text-center text-white"> {% trans "Copyright" %} &copy;  {% trans "Your Website 2023" %}</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

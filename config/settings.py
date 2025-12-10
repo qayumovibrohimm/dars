@@ -43,18 +43,24 @@ INSTALLED_APPS = [
     'import_export',
     'adminsortable2',
     'user.apps.UserConfig',
-
+    'parler',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # <-- bu yerda
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'user.middleware.AutoLogoutMiddleware',
+    'user.middleware.AuthCheckMiddleware',
+
+
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -111,6 +117,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ('uz', "O'zbekcha"),
+    ('ru', 'Русский'),
+    ('en', 'English'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'uz',},
+        {'code': 'ru',},
+        {'code': 'en',},
+    ),
+    'default': {
+        'fallbacks': ['en'],          # defaults to PARLER_DEFAULT_LANGUAGE_CODE
+        'hide_untranslated': False,   # the default; let .active_translations() return fallbacks too.
+    }
+}
+
 
 TIME_ZONE = 'Asia/Tashkent'
 
@@ -189,3 +218,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 AUTH_USER_MODEL = 'user.CustomUser'
+
+
+AUTO_LOGOUT_DELAY = 12
